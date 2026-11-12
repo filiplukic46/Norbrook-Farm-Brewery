@@ -1,0 +1,76 @@
+---
+import { url } from '../../lib/url';
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import Button from '../../components/Button.astro';
+import Foam from '../../components/Foam.astro';
+import Rise from '../../components/Rise.astro';
+import { beers, site, type Beer } from '../../data/site';
+
+export function getStaticPaths() {
+  return beers.map((beer, i) => ({ params: { slug: beer.slug }, props: { beer, i } }));
+}
+interface Props { beer: Beer; i: number }
+const { beer, i } = Astro.props;
+const next = beers[(i + 1) % beers.length];
+const prev = beers[(i - 1 + beers.length) % beers.length];
+const n = String(i + 1).padStart(2, '0');
+---
+<Base title={beer.name} description={`${beer.name} is a ${beer.abv} ${beer.style.toLowerCase()} brewed on the farm at Norbrook Farm Brewery in Colebrook, CT. ${beer.ibu} IBU.`} current="Beers">
+  <article class:list={['pint', `glass glass--${beer.pour}`, { 'is-dark': beer.dark }]} data-pint>
+    <Rise seed={i * 13 + 5} count={18} />
+    <div class="wrap pint__grid">
+      <nav class="pint__crumbs label" aria-label="Breadcrumb">
+        <a class="u" href={url('/#beers')}>Tap list</a> <span aria-hidden="true">/</span> <span aria-current="page">{n} of {String(beers.length).padStart(2, '0')}</span> <span aria-hidden="true">/</span> <span>{beer.group === 'seasonal' ? 'Seasonal' : 'Year-round'}</span>
+      </nav>
+      <div class="pint__copy">
+        <p class="pint__style note">{beer.style}</p>
+        <h1 class="pint__h display-xl" data-split="lines" data-intro data-delay="0.1">{beer.name}</h1>
+        <dl class="pint__specs" data-reveal="up" data-intro data-delay="0.35">
+          <div><dt class="label">ABV</dt><dd>{beer.abv}</dd></div>
+          <div><dt class="label">IBU</dt><dd>{beer.ibu}</dd></div>
+          <div><dt class="label">Brewed</dt><dd>Colebrook, CT</dd></div>
+        </dl>
+        <p class="lead pint__note" data-reveal="up" data-intro data-delay="0.45">{beer.description ?? beer.styleNote}</p>
+        <div class="ctas" data-reveal="up" data-intro data-delay="0.55">
+          <Button href={site.links.order} label="Order cans to go" variant={beer.dark ? 'cream' : 'ink'} />
+          <Button href={url('/#visit')} label="Drink it on the farm" variant={beer.dark ? 'outline-cream' : 'outline'} arrow={false} />
+        </div>
+        <p class="pint__ask">On tap and in cans while it lasts. Call <a class="u" href={site.phoneHref}>{site.phone}</a> to check today's list.</p>
+      </div>
+      <div class="pint__can" data-pint-can>
+        <Image src={beer.can} alt={`${beer.name} can`} widths={[260, 452]} sizes="(min-width: 768px) 26vw, 46vw" loading="eager" fetchpriority="high" data-critical />
+      </div>
+    </div>
+    <Foam seed={i * 7 + 61} />
+  </article>
+
+  <section class="tasting wrap" aria-labelledby="tasting-h">
+    <div class="tasting__head">
+      <h2 id="tasting-h" class="display-m" data-split="lines">Tasting sheet</h2>
+      <p class="tasting__note note-s">{beer.style}, {beer.abv}</p>
+    </div>
+    <dl class="tasting__list">
+      {beer.malt && <div data-reveal="up"><dt class="label">Malt</dt><dd>{beer.malt}</dd></div>}
+      {beer.hops && <div data-reveal="up"><dt class="label">Hops</dt><dd>{beer.hops}</dd></div>}
+      <div data-reveal="up"><dt class="label">In the glass</dt><dd>{beer.sheet.look}</dd></div>
+      <div data-reveal="up"><dt class="label">On the nose</dt><dd>{beer.sheet.nose}</dd></div>
+      <div data-reveal="up"><dt class="label">On the tongue</dt><dd>{beer.sheet.taste}</dd></div>
+      <div data-reveal="up"><dt class="label">Serve it</dt><dd>{beer.sheet.serve}</dd></div>
+      <div class="tasting__pair" data-reveal="up"><dt class="label">From our kitchen</dt><dd>{beer.sheet.pair}. <a class="u" href={site.links.order}>Order it to go</a></dd></div>
+    </dl>
+  </section>
+
+  <nav class="pours wrap" aria-label="More beers">
+    <a class="pours__link pours__link--prev" href={url(`/beers/${prev.slug}/`)}>
+      <svg width="44" height="22" viewBox="0 0 26 14" fill="none" aria-hidden="true"><path d="M1.5 7.3C7 6.5 15 7.6 24 6.9M18.6 1.6c2 1.8 3.9 3.5 5.6 5.3-1.9 1.5-3.6 3.2-5.3 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      <span class="label">Previous pour</span>
+      <span class="pours__name">{prev.name}</span>
+    </a>
+    <a class="pours__link pours__link--next" href={url(`/beers/${next.slug}/`)}>
+      <span class="label">Next pour</span>
+      <span class="pours__name">{next.name}</span>
+      <svg width="44" height="22" viewBox="0 0 26 14" fill="none" aria-hidden="true"><path d="M1.5 7.3C7 6.5 15 7.6 24 6.9M18.6 1.6c2 1.8 3.9 3.5 5.6 5.3-1.9 1.5-3.6 3.2-5.3 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    </a>
+  </nav>
+</Base>

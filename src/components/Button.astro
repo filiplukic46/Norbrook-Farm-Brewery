@@ -1,0 +1,26 @@
+---
+// Pill button. Hover/focus: the next pour rises inside the pill (CSS), the arrow travels.
+interface Props {
+  href: string;
+  label: string;
+  variant?: 'ink' | 'outline' | 'cream' | 'outline-cream';
+  arrow?: boolean;
+  class?: string;
+}
+const { href, label, variant = 'ink', arrow = true, class: cls = '' } = Astro.props;
+const external = /^https?:/.test(href);
+---
+<a
+  class:list={['btn', `btn--${variant}`, cls]}
+  href={href}
+  {...(external ? { target: '_blank', rel: 'noopener', 'data-astro-reload': true } : {})}
+>
+  <span class="btn__fill" aria-hidden="true"></span>
+  <span class="btn__label">{label}</span>
+  {arrow && (
+    <svg class="btn__arrow" width="14" height="10" viewBox="0 0 14 10" fill="none" aria-hidden="true">
+      <path d="M1 5h11.5M8.5 1.5 12.5 5l-4 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  )}
+  {external && <span class="sr-only">(opens in a new tab)</span>}
+</a>

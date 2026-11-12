@@ -1,0 +1,316 @@
+---
+import { url } from '../lib/url';
+import { Image, getImage } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Button from '../components/Button.astro';
+import Foam from '../components/Foam.astro';
+import Gauge from '../components/Gauge.astro';
+import Rise from '../components/Rise.astro';
+import map from '../assets/brand/map.png';
+import { site, hero, about, trail, glasses, glassMedia, toGoMenu, jobsStatement, beers, beersIntro, reviews } from '../data/site';
+import { sketchOval, arrow } from '../lib/sketch';
+
+// Glass positions on the hero photo (fractions of the photo box), pale glass 1 on the right.
+const gpos = [[0.771, 0.125], [0.692, 0.148], [0.614, 0.171], [0.533, 0.191], [0.454, 0.212]];
+const g = Object.fromEntries(glasses.map((x) => [x.id, x]));
+const ovalRing = sketchOval(350, 440, 12, 4);
+const spreadRing = sketchOval(624, 424, 31, 4);
+const crewRing = sketchOval(470, 610, 53, 5);
+const barArrow = arrow([[6, 40], [40, 18], [86, 8]]);
+const scrollArrow = arrow([[6, 4], [10, 20], [8, 36]], 8);
+const tapGroups = [
+  { id: 'year-round', title: 'Year-round', note: 'always on the board', beers: beers.filter((b) => b.group === 'year-round') },
+  { id: 'seasonal', title: 'Seasonal', note: 'here for a while, then gone', beers: beers.filter((b) => b.group === 'seasonal') },
+];
+const canPreviews = await Promise.all(beers.map((b) => getImage({ src: b.can, width: 420, format: 'webp' })));
+---
+<Base>
+  <!-- HERO: the flight is the table of contents -->
+  <section class="hero" aria-labelledby="h1">
+    <div class="hero__inner wrap">
+      <div class="hero__mark" aria-hidden="true" data-split="chars" data-intro>Norbrook</div>
+      <h1 id="h1" class="hero__h1" data-split="lines" data-intro data-delay="0.25">{hero.h1}</h1>
+      <div class="hero__copy">
+        <p class="hero__lede" data-reveal="up" data-intro data-delay="0.45">{hero.lede}</p>
+        <div class="hero__ctas" data-reveal="up" data-intro data-delay="0.55">
+          <Button href="#beers" label="See what's pouring" />
+          <Button href="#visit" label="Plan your visit" variant="outline" arrow={false} />
+        </div>
+        <p class="hero__addr">{site.address.street}, {site.address.city}, {site.address.region} {site.address.zip}</p>
+        <p class="hero__scroll note" aria-hidden="true">scroll down the paddle
+          <svg width="20" height="42" viewBox="0 0 20 42" fill="none"><path d={scrollArrow.d} stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /><path d={scrollArrow.head} stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        </p>
+      </div>
+      <div class="hero__photo" data-hero-photo>
+        <div class="hero__img" data-hero-img>
+          <Image src={hero.photo.src} alt={hero.photo.alt} widths={[600, 900, 1200, 1600, 2000, 2400]} sizes="(min-width: 768px) 63vw, 100vw" quality={70} loading="eager" fetchpriority="high" data-critical />
+        </div>
+        {gpos.map(([x, y], i) => (
+          <span class={`gnum gnum--${i + 1}`} style={`--x:${x * 100}%;--y:${y * 100}%`} aria-hidden="true" data-gnum>
+            <svg viewBox="0 0 44 44"><path d={sketchOval(44, 44, 101 + i * 7, 3)} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+            <span>{i + 1}</span>
+          </span>
+        ))}
+      </div>
+      <nav class="sheet" aria-label="The flight, five ways in">
+        <p class="sheet__title note-s">{hero.sheetTitle}</p>
+        <ol>
+          {glasses.map((x) => (
+            <li><a href={`#${x.id}`} data-glass={x.n} class="sheet__row"><span class="sheet__n">{x.n}</span><span class="sheet__swatch" style={`--pour:var(--${x.pour})`} aria-hidden="true"></span><span class="sheet__name">{x.short}</span></a></li>
+          ))}
+        </ol>
+      </nav>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about" aria-labelledby="about-h">
+    <div class="wrap">
+      <h2 id="about-h" class="about__h display-xl" data-split="lines">{about.h2}</h2>
+      <p class="about__aside note" aria-hidden="true">{about.aside}</p>
+      <div class="about__grid">
+        <div class="about__left">
+          <h3 class="lead">{about.h3}</h3>
+          <figure class="about__fig">
+            <div class="oval" data-reveal="scale"><Image src={about.photo.src} alt={about.photo.alt} widths={[400, 700, 1000]} sizes="(min-width: 768px) 23vw, 80vw" /></div>
+            <svg class="about__ring" viewBox="0 0 350 440" aria-hidden="true"><path d={ovalRing} fill="none" stroke="currentColor" stroke-width="2" /></svg>
+            <figcaption class="note-s">{about.caption}</figcaption>
+          </figure>
+        </div>
+        <div class="about__mid">
+          <p>{about.paragraphs[0]}</p>
+          <p>{about.paragraphs[1]}</p>
+        </div>
+        <div class="about__right">
+          <p>{about.paragraphs[2]}</p>
+          <dl class="facts">
+            {about.facts.map((f) => (<div class="fact"><dt>{f.label}</dt><dd>{f.n}</dd></div>))}
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FARM TRAIL -->
+  <section class="trail" id="farm-trail" aria-labelledby="trail-h">
+    <div class="wrap trail__head">
+      <h2 id="trail-h" class="display-xl" data-split="lines">{trail.h2.map((l, i) => (<>{l}{i < trail.h2.length - 1 && <br />}</>))}</h2>
+      <div class="trail__intro">
+        <h3 class="lead">{trail.h3}</h3>
+        <p>{trail.body}</p>
+        <div class="ctas">
+          <Button href={url('/#farm-trail-map')} label="Farm Trail" />
+          <Button href={site.links.bikeRentals} label="Bike Rentals" variant="outline" arrow={false} />
+        </div>
+      </div>
+    </div>
+    <div class="wrap trail__wall" id="farm-trail-map">
+      {trail.photos.map((p, i) => (
+        <figure class={`trail__fig trail__fig--${i + 1}`}>
+          <div class="trail__img" data-reveal="clip"><Image src={p.src} alt={p.alt} widths={[600, 1000, 1400, 1800]} sizes="(min-width: 768px) 48vw, 100vw" /></div>
+          <figcaption class="note-s">{p.caption}</figcaption>
+        </figure>
+      ))}
+      <p class="stamp note-s"><span>{trail.stamp}</span></p>
+    </div>
+  </section>
+
+  <!-- THE FLIGHT: five glasses, palest to darkest -->
+  <div class="flight" data-flight>
+    <Gauge />
+    <div class="flight__track" data-track>
+
+    <section class="glass glass--straw glass--1" id="celebrate" data-glass-section="0" aria-labelledby="g1-h">
+      <div class="glass__media glass__media--right">
+        <Image src={glassMedia.celebrate.src} alt={glassMedia.celebrate.alt} widths={[700, 1100, 1500, 1800]} sizes="(min-width: 768px) 48vw, 100vw" />
+        <p class="tag note-s">the Sunroom + private event space</p>
+      </div>
+      <div class="wrap glass__wrap">
+        <div class="glass__copy">
+          <h2 id="g1-h" class="display-l" data-split="lines">{g.celebrate.h2.map((l, i) => (<>{l}{i === 0 && <br />}</>))}</h2>
+          <p class="lead">{g.celebrate.lead}</p>
+          <p>{g.celebrate.body}</p>
+          <ul class="tags">{g.celebrate.tags.map((t) => <li>{t}</li>)}</ul>
+          <div class="ctas"><Button href={g.celebrate.cta.href} label={g.celebrate.cta.label} /><p class="note-s glass__note">{g.celebrate.note}</p></div>
+        </div>
+      </div>
+      <Rise seed={111} />
+      <Foam seed={11} />
+    </section>
+
+    <section class="glass glass--gold glass--2" id="catering" data-glass-section="1" aria-labelledby="g2-h">
+      <div class="wrap glass__wrap">
+        <h2 id="g2-h" class="display-l glass__wide" data-split="lines">{g.catering.h2.map((l, i) => (<>{l}{i === 0 && <br />}</>))}</h2>
+        <div class="cater__media">
+          <div class="oval cater__spread"><Image src={glassMedia.catering.src} alt={glassMedia.catering.alt} widths={[600, 1100, 1500]} sizes="(min-width: 768px) 42vw, 90vw" /></div>
+          <svg class="cater__ring" viewBox="0 0 624 424" aria-hidden="true"><path d={spreadRing} fill="none" stroke="currentColor" stroke-width="2" /></svg>
+          <div class="cater__chef"><Image src={glassMedia.cateringKitchen.src} alt={glassMedia.cateringKitchen.alt} widths={[300, 500, 700]} sizes="(min-width: 1441px) 18vw, 200px" /></div>
+          <p class="note-s cater__note">{g.catering.note}</p>
+        </div>
+        <div class="glass__copy cater__copy">
+          <p class="lead">{g.catering.lead}</p>
+          <p>{g.catering.body}</p>
+          <ul class="tags">{g.catering.tags.map((t) => <li>{t}</li>)}</ul>
+          <div class="ctas"><Button href={g.catering.cta.href} label={g.catering.cta.label} /></div>
+        </div>
+      </div>
+      <Rise seed={123} />
+      <Foam seed={23} />
+    </section>
+
+    <section class="glass glass--amber glass--3 is-dark" id="book" data-glass-section="2" aria-labelledby="g3-h">
+      <div class="glass__media glass__media--left">
+        <Image src={glassMedia.book.src} alt={glassMedia.book.alt} widths={[700, 1100, 1500, 1800]} sizes="(min-width: 768px) 50vw, 100vw" />
+        <p class="note book__note">{g.book.note}
+          <svg width="96" height="48" viewBox="0 0 96 48" fill="none" aria-hidden="true"><path d={barArrow.d} stroke="currentColor" stroke-width="2" stroke-linecap="round" /><path d={barArrow.head} stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        </p>
+      </div>
+      <div class="wrap glass__wrap">
+        <div class="glass__copy book__copy">
+          <h2 id="g3-h" class="display-l" data-split="lines">{g.book.h2.map((l, i) => (<>{l}{i === 0 && <br />}</>))}</h2>
+          <p class="lead">{g.book.lead}</p>
+          <p>{g.book.body}</p>
+          <div class="ctas"><Button href={g.book.cta.href} label={g.book.cta.label} variant="cream" /><p class="book__call">or call <a class="u" href={site.phoneHref}>{site.phone}</a></p></div>
+        </div>
+      </div>
+      <Rise seed={137} />
+      <Foam seed={37} />
+    </section>
+
+    <section class="glass glass--ruby glass--4 is-dark" id="to-go" data-glass-section="3" aria-labelledby="g4-h">
+      <div class="wrap glass__wrap">
+        <div class="glass__copy togo__copy">
+          <h2 id="g4-h" class="display-l" data-split="lines">{g['to-go'].h2.map((l, i) => (<>{l}{i === 0 && <br />}</>))}</h2>
+          <p class="lead">{g['to-go'].lead}</p>
+          <p>{g['to-go'].body}</p>
+          <div class="ctas"><Button href={g['to-go'].cta.href} label={g['to-go'].cta.label} variant="cream" /><p class="note-s glass__note">{g['to-go'].note}</p></div>
+        </div>
+        <div class="board">
+          {toGoMenu.map((grp) => (
+            <div class="board__group">
+              <h3 class="note board__h">{grp.group}</h3>
+              <ul>{grp.items.map(([n, m]) => (<li class="board__item"><span class="board__name">{n}</span><span class="board__meta">{m}</span></li>))}</ul>
+            </div>
+          ))}
+        </div>
+        <div class="togo__oven"><Image src={glassMedia.toGo.src} alt={glassMedia.toGo.alt} widths={[300, 500, 700]} sizes="(min-width: 1441px) 18vw, 230px" /></div>
+      </div>
+      <Rise seed={147} />
+      <Foam seed={47} />
+    </section>
+
+    <section class="glass glass--stout glass--5 is-dark" id="jobs" data-glass-section="4" aria-labelledby="g5-h">
+      <div class="wrap glass__wrap">
+        <div class="glass__copy jobs__copy">
+          <h2 id="g5-h" class="display-l" data-split="lines">{g.jobs.h2[0]}</h2>
+          <p class="lead">{g.jobs.lead}</p>
+          <p class="jobs__statement">{jobsStatement}</p>
+          <p>{g.jobs.body}</p>
+          <div class="ctas"><Button href={g.jobs.cta.href} label={g.jobs.cta.label} variant="cream" /></div>
+        </div>
+        <figure class="jobs__fig">
+          <div class="oval"><Image src={glassMedia.jobs.src} alt={glassMedia.jobs.alt} widths={[500, 900, 1300]} sizes="(min-width: 768px) 31vw, 80vw" /></div>
+          <svg class="jobs__ring" viewBox="0 0 470 610" aria-hidden="true"><path d={crewRing} fill="none" stroke="currentColor" stroke-width="2" /></svg>
+          <figcaption class="note">{g.jobs.note}</figcaption>
+        </figure>
+      </div>
+      <Rise seed={159} />
+      <Foam seed={59} />
+    </section>
+    </div>
+  </div>
+
+  <!-- BEERS: tap list index with a can that follows the pointer -->
+  <section class="beers" id="beers" aria-labelledby="beers-h">
+    <div class="wrap beers__head">
+      <h2 id="beers-h" class="display-xl" data-split="lines">{beersIntro.h2[0]}<br />{beersIntro.h2[1]}</h2>
+      <div class="beers__intro">
+        <h3 class="lead">{beersIntro.h3}</h3>
+        <p>{beersIntro.body}</p>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="taps" data-taps>
+        <div class="taps__bar" hidden data-tabs-bar>
+          <div class="taps__tabs" role="tablist" aria-label="Beer list">
+            {tapGroups.map((grp, k) => (
+              <button class="tabbtn" type="button" role="tab" id={`tab-${grp.id}`} aria-controls={`taps-${grp.id}`} aria-selected={k === 0 ? 'true' : 'false'} tabindex={k === 0 ? 0 : -1} data-tab={grp.id} data-note={grp.note}>
+                <span class="tabbtn__fill" aria-hidden="true"></span>{grp.title} <span class="tabbtn__n">{grp.beers.length}</span>
+              </button>
+            ))}
+          </div>
+          <p class="taps__bar-note note-s" aria-hidden="true" data-tabs-note>{tapGroups[0].note}</p>
+        </div>
+        <div class="taps__head" aria-hidden="true"><span>#</span><span>Beer</span><span>Style</span><span>ABV</span><span>IBU</span></div>
+        {tapGroups.map((grp) => (
+          <div class="taps__group" id={`taps-${grp.id}`} data-tab-panel={grp.id}>
+            <h3 class="taps__title"><span>{grp.title}</span> <span class="taps__note note-s">{grp.note}</span></h3>
+            <ul>
+              {grp.beers.map((b) => (
+                <li>
+                  <a class="tap" href={url(`/beers/${b.slug}/`)} data-can={canPreviews[beers.indexOf(b)].src}>
+                    <span class="tap__fill" aria-hidden="true"></span>
+                    <span class="tap__n">{String(beers.indexOf(b) + 1).padStart(2, '0')}</span>
+                    <span class="tap__name">{b.name}</span>
+                    <span class="tap__style" data-abv={`${b.abv} ABV`}>{b.style}</span>
+                    <span class="tap__abv"><span class="sr-only">ABV </span>{b.abv}</span>
+                    <span class="tap__ibu"><span class="sr-only">IBU </span>{b.ibu}</span>
+                    <span class="tap__thumb" aria-hidden="true"><Image src={b.can} alt="" width={60} height={146} /></span>
+                    <svg class="tap__arrow" width="26" height="14" viewBox="0 0 26 14" fill="none" aria-hidden="true"><path d="M1.5 7.3C7 6.5 15 7.6 24 6.9M18.6 1.6c2 1.8 3.9 3.5 5.6 5.3-1.9 1.5-3.6 3.2-5.3 5.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+      <div class="ctas beers__ctas">
+        <Button href={site.links.order} label="Order cans to go" />
+        <Button href={site.links.storeLocator} label="Find our cans" variant="outline" arrow={false} />
+        <p class="note-s muted">{beersIntro.count}</p>
+      </div>
+    </div>
+    <div class="can-preview" aria-hidden="true" data-can-preview><img src={canPreviews[0].src} alt="" width="150" height="365" decoding="async" /></div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section class="reviews" aria-labelledby="rev-h">
+    <div class="wrap">
+      <div class="reviews__head">
+        <h2 id="rev-h" class="display-l" data-split="lines">{reviews.h2[0]}<br />{reviews.h2[1]}</h2>
+        <div class="reviews__aside">
+          <p class="lead">{reviews.sub}</p>
+          <Button href={site.links.reviews} label="Read more on Google" variant="outline" />
+        </div>
+      </div>
+      <figure class="quote">
+        <span class="quote__mark" aria-hidden="true">“</span>
+        <blockquote><p>{reviews.featured.text}</p></blockquote>
+        <figcaption class="note">{reviews.featured.name}, on Google</figcaption>
+      </figure>
+      <ul class="quotes">
+        {reviews.more.map((r) => (<li><figure><blockquote><p>“{r.text}”</p></blockquote><figcaption class="note-s">{r.name}</figcaption></figure></li>))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- VISIT -->
+  <section class="visit" id="visit" aria-labelledby="visit-h">
+    <div class="wrap visit__grid">
+      <div class="visit__map"><Image src={map} alt="Hand-drawn map: from Route 44 take Rock Hall Road north, then Stillman Hill Road east to the brewery" widths={[700, 1368]} sizes="(min-width: 768px) 48vw, 100vw" /></div>
+      <div class="visit__info">
+        <h2 id="visit-h" class="display-l" data-split="lines">Find your way<br />to the farm</h2>
+        <dl class="visit__dl">
+          <div><dt class="label">Address</dt><dd>{site.address.street}<br />{site.address.city}, {site.address.region} {site.address.zip}</dd></div>
+          <div><dt class="label">Hours</dt><dd><table class="hours"><tbody>{site.hours.map((h) => <tr><th scope="row">{h.days}</th><td>{h.time}</td></tr>)}</tbody></table></dd></div>
+          <div><dt class="label">Get in touch</dt><dd><a class="u" href={site.phoneHref}>{site.phone}</a><br /><a class="u" href={`mailto:${site.email}`}>{site.email}</a></dd></div>
+        </dl>
+        <div class="ctas">
+          <Button href={site.links.directions} label="Get directions" />
+          <Button href={site.links.merch} label="Shop merch" variant="outline" arrow={false} />
+        </div>
+        <p class="note-s visit__note">trails & disc golf: open daily</p>
+      </div>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,25 @@
+---
+import { url } from '../lib/url';
+import Base from '../layouts/Base.astro';
+import Button from '../components/Button.astro';
+import { GLASS_PATH, sketchOval } from '../lib/sketch';
+const ring = sketchOval(300, 300, 404, 6);
+---
+<Base title="Page not found" description="This glass is empty. The page you were after is not on the farm, but the tap list is.">
+  <section class="empty wrap" aria-labelledby="empty-h">
+    <div class="empty__glass" aria-hidden="true">
+      <svg viewBox="0 0 24 28"><path d={GLASS_PATH} fill="none" stroke="currentColor" stroke-width="0.7" stroke-linejoin="round" /><path class="empty__drip" d="M9 22.6c1.6.6 4.4.6 6 0" fill="none" stroke="var(--gold)" stroke-width="1.2" stroke-linecap="round" /></svg>
+      <svg class="empty__ring" viewBox="0 0 300 300"><path d={ring} fill="none" stroke="currentColor" stroke-width="2" /></svg>
+      <span class="empty__n note">no. 404</span>
+    </div>
+    <div class="empty__copy">
+      <p class="note empty__kicker">someone finished this one</p>
+      <h1 id="empty-h" class="display-xl" data-split="lines" data-intro>This glass<br />is empty</h1>
+      <p class="lead">The page you were after isn't on the farm. The beer, the oven and the trails still are.</p>
+      <div class="ctas" data-reveal="up" data-intro data-delay="0.4">
+        <Button href={url('/#beers')} label="Pour another" />
+        <Button href={url('/')} label="Back to the farm" variant="outline" arrow={false} />
+      </div>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,24 @@
+---
+// Carbonation: a few bubbles rising up a pour. CSS-only, runs while the glass is .is-live.
+import { rng } from '../lib/sketch';
+interface Props { seed: number; count?: number }
+const { seed, count = 14 } = Astro.props;
+const r = rng(seed);
+// Bubbles climb the walls of the glass, the way carbonation does: they rise in the side
+// margins and never cross the copy.
+const items = Array.from({ length: count }, (_, k) => {
+  const right = k % 2 === 1;
+  const sw = 4 + r() * 10; // drift, mostly toward the wall
+  return {
+    side: right ? 'r' : 'l',
+    o: (r() * 0.9).toFixed(2),
+    s: (3 + r() * 6).toFixed(1),
+    d: (9 + r() * 10).toFixed(1),
+    dl: (-r() * 18).toFixed(1),
+    sw: (right ? sw : -sw).toFixed(0),
+  };
+});
+---
+<div class="rise" aria-hidden="true">
+  {items.map((b) => <span class={b.side} style={`--o:${b.o};--s:${b.s}px;--d:${b.d}s;--dl:${b.dl}s;--sway:${b.sw}px`}></span>)}
+</div>

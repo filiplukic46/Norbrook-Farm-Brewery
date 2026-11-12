@@ -1,0 +1,91 @@
+---
+import { url } from '../lib/url';
+import { ClientRouter } from 'astro:transitions';
+import { site } from '../data/site';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { foamEdge } from '../lib/sketch';
+import '../styles/tokens.css';
+import '../styles/engine.css';
+import '../styles/site.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  current?: string;
+  pageClass?: string;
+}
+const { title, description = site.description, image = '/og.png', current, pageClass } = Astro.props;
+const fullTitle = title ? `${title} | ${site.name}` : `${site.name} | Craft beer & trails in Colebrook, CT`;
+// Canonical always names the brewery's own domain, without the sub-path a preview host adds.
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const canonical = new URL(Astro.url.pathname.slice(base.length) || '/', site.url).href;
+const ogImage = new URL(url(image), Astro.site ?? site.url).href;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Brewery',
+  name: site.name,
+  url: site.url,
+  telephone: '+1-860-909-1016',
+  email: site.email,
+  servesCuisine: ['Pizza', 'Pub food'],
+  address: { '@type': 'PostalAddress', streetAddress: '204 Stillman Hill Rd', addressLocality: site.address.city, addressRegion: site.address.region, postalCode: site.address.zip, addressCountry: 'US' },
+  openingHoursSpecification: site.hours.filter((h) => h.spec.length).map((h) => ({ '@type': 'OpeningHoursSpecification', dayOfWeek: h.spec, opens: h.opens, closes: h.closes })),
+  foundingDate: '2018',
+  founder: [{ '@type': 'Person', name: 'John Auclair' }, { '@type': 'Person', name: 'Randy Auclair' }],
+};
+const curtainEdge = foamEdge(91, 2880, 48, 22);
+---
+<!doctype html>
+<html lang="en" transition:animate="none">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#f4ecd8" />
+    <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
+    <link rel="sitemap" href={url('/sitemap-index.xml')} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <link rel="preload" href={url('/fonts/big-shoulders-display-700_900-normal.woff2')} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={url('/fonts/host-grotesk-400_600-normal.woff2')} as="font" type="font/woff2" crossorigin />
+    <slot name="head" />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('motion');
+    </script>
+    <ClientRouter fallback="swap" />
+  </head>
+  <body class={pageClass}>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div id="curtain" transition:persist="curtain" aria-hidden="true">
+      <div class="curtain__panel">
+        <svg class="curtain__edge" viewBox="0 0 2880 48" preserveAspectRatio="none"><path d={curtainEdge} fill="currentColor" /></svg>
+      </div>
+    </div>
+    <Header current={current} />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+    <script>
+      import { start } from '../engine/astro';
+      import { setupMotion } from '../motion/setup';
+      start(setupMotion);
+    </script>
+  </body>
+</html>

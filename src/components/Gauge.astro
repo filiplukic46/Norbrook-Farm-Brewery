@@ -1,0 +1,22 @@
+---
+// Fixed five-glass gauge: which glass of the flight you are in. Filled by the pour driver.
+import { glasses } from '../data/site';
+import { GLASS_PATH } from '../lib/sketch';
+---
+<nav class="gauge" aria-label="The flight" data-gauge>
+  <ol>
+    {glasses.map((g) => (
+      <li>
+        <a href={`#${g.id}`} class="gauge__glass" data-gauge-glass={g.n - 1} style={`--pour: var(--${g.pour})`}>
+          <svg width="24" height="28" viewBox="0 0 24 28" aria-hidden="true">
+            <defs><clipPath id={`gclip-${g.n}`}><path d={GLASS_PATH} /></clipPath></defs>
+            <g clip-path={`url(#gclip-${g.n})`}><rect class="gauge__fill" x="0" y="0" width="24" height="28" /></g>
+            <path d={GLASS_PATH} fill="none" stroke="currentColor" stroke-width="1.6" />
+          </svg>
+          <span class="sr-only">Glass {g.n}: {g.short}</span>
+        </a>
+      </li>
+    ))}
+  </ol>
+  <span class="gauge__count" aria-hidden="true" data-gauge-count>1/5</span>
+</nav>

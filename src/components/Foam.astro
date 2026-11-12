@@ -1,0 +1,17 @@
+---
+// The pour layer of a glass section: a foam overlay whose wavy bottom edge is the liquid level.
+// Static (no JS / reduced motion): the overlay rests as a foam head at the top of the section.
+// With motion, src/motion/pour.ts drives its y from scroll (the beer rises as you arrive).
+import { foamEdge, bubbles } from '../lib/sketch';
+interface Props { seed: number }
+const { seed } = Astro.props;
+const edge = foamEdge(seed);
+const fizz = bubbles(seed + 7, 46, 1440, 28);
+---
+<div class="foam" aria-hidden="true" data-foam>
+  <div class="foam__body"></div>
+  <div class="foam__edge">
+    <svg class="foam__wave" viewBox="0 0 2880 48" preserveAspectRatio="none"><path d={edge} fill="currentColor" /></svg>
+  </div>
+  <svg class="foam__fizz" viewBox="0 0 1440 28" preserveAspectRatio="none"><path d={fizz} fill="currentColor" /></svg>
+</div>

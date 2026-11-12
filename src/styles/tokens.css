@@ -1,0 +1,86 @@
+/* Norbrook "The Flight" tokens. Palette sampled from the five NFB tasting glasses (DESIGN.md). */
+@font-face {
+  font-family: 'Big Shoulders Display';
+  src: url('/fonts/big-shoulders-display-700_900-normal.woff2') format('woff2');
+  font-weight: 700 900; font-style: normal; font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Host Grotesk';
+  src: url('/fonts/host-grotesk-400_600-normal.woff2') format('woff2');
+  font-weight: 400 600; font-style: normal; font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Caveat';
+  src: url('/fonts/caveat-700-normal.woff2') format('woff2');
+  font-weight: 700; font-style: normal; font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  /* Pours, palest to darkest */
+  --foam: #f4ecd8;
+  --foam-deep: #eadfc4;
+  --straw: #f3cf6b;
+  --gold: #e8a33a;
+  --amber: #9a4416;
+  --ruby: #6a1a12;
+  --stout: #221510;
+  --ink: #1c1210;
+  --muted: #5e5044;
+  --cream: #f7eedb;
+  --red: #8c1d1a; /* the logo's red: annotations only */
+
+  /* Roles (engine contract) */
+  --c-bg: var(--foam);
+  --c-fg: var(--ink);
+  --c-muted: var(--muted);
+  --c-line: rgb(28 18 16 / 0.16);
+  --c-accent: var(--red);
+  --c-curtain: var(--amber);
+
+  /* Families */
+  --f-display: 'Big Shoulders Display', 'Arial Narrow', Impact, sans-serif;
+  --f-body: 'Host Grotesk', system-ui, sans-serif;
+  --f-hand: 'Caveat', 'Comic Sans MS', cursive;
+
+  /* Fluid scale (390 → 1440) */
+  --t-xl: clamp(3.5rem, 1.6rem + 7.8vw, 9.375rem);    /* 150 */
+  --t-l: clamp(3rem, 1.9rem + 4.6vw, 6rem);            /* 96 */
+  --t-m: clamp(2.125rem, 1.5rem + 2.6vw, 3.5rem);      /* 56 */
+  --t-title: clamp(1.5rem, 1.25rem + 1vw, 2.125rem);   /* 34 */
+  --t-lead: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);    /* 24 */
+  --t-body: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);    /* 18 */
+  --t-s: 0.9375rem;                                     /* 15 */
+  --t-xs: 0.8125rem;                                    /* 13 */
+  --t-note: clamp(1.5rem, 1.3rem + 0.75vw, 1.875rem);  /* 30 */
+  --t-note-s: clamp(1.25rem, 1.15rem + 0.4vw, 1.4375rem); /* 23 */
+
+  /* Space */
+  --u: clamp(0.5rem, 0.35rem + 0.6vw, 1rem);
+  --margin: clamp(1.25rem, 8.333vw, 7.5rem);          /* 120 at 1440 */
+  --gutter: clamp(1rem, 0.6rem + 1vw, 1.5rem);        /* 24 at 1440 */
+  --max: 90rem;
+  --head: 4.875rem;                                    /* foam head height */
+
+  /* Shape: pills for buttons, ovals for photos, square for everything else */
+  --radius: 0px;
+  --pill: 999px;
+
+  /* Glass gauge ink (the pour driver switches it on dark glasses) */
+  --gauge-ink: var(--ink);
+
+  --z-content: 1;
+  --z-header: 50;
+  --z-gauge: 40;
+  --z-curtain: 90;
+}
+
+/* Large screens: the whole rem system grows gently past 1440 so the page keeps its proportions
+   (1x at 1440, 1.15x at 1920, 1.35x at 2560, 1.75x at 3840), but only as far as the window is
+   tall too (16px per 900px of height): a wide but short laptop window stays at 1x.
+   Nothing changes at or below 1440. */
+@media (min-width: 1441px) {
+  html { font-size: max(100%, min(calc(0.55rem + 0.5vw), calc(100vh / 56.25), 175%)); }
+}
